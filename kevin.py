@@ -41,6 +41,8 @@ class User(db.Model):
     num_friends = db.Column(db.Integer)
     # languages
 
+    photos = db.relationship('Photo', backref='user', lazy='dynamic')
+
     #not yet ready queries
     #edu_type=me.data['education']['type']
 
@@ -50,8 +52,8 @@ class User(db.Model):
 
 class Photo(db.Model):
     __tablename__ = 'photos'
-    # id = db.Column(db.Integer, primary_key=True)
-    pid = db.Column(db.String(1000), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    pid = db.Column(db.String(1000))
     # album = db.Column(db.String(100))
     photo_url = db.Column(db.String(1000)) #link to album (link)
     created_time = db.Column(db.DateTime(timezone=False)) #(created_time)
@@ -63,11 +65,10 @@ class Photo(db.Model):
     #place 
     #prim_color
 
-    id = db.Column(db.Integer, db.ForeignKey('users.id')) #foreign key to User's id (NOT fbid)
-    user = db.relationship("User", backref=db.backref('photos', order_by=id))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id')) #foreign key to User's id (NOT fbid)
 
     def __repr__(self):
-        return '#%s: Photo URL: %s, Likes: %d, Comments: %d' % (self.pid, self.photo_url, self.num_likes, self.num_comments)
+        return '#%d: Photo ID: %sPhoto URL: %s, Likes: %d, Comments: %d' % (self.id, self.pid, self.photo_url, self.num_likes, self.num_comments)
 
 
 facebook = oauth.remote_app('facebook',
