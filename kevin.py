@@ -51,9 +51,9 @@ class User(db.Model):
 class Photo(db.Model):
     __tablename__ = 'photos'
     # id = db.Column(db.Integer, primary_key=True)
-    pid = db.Column(db.String(100), primary_key=True)
+    pid = db.Column(db.String(1000), primary_key=True)
     # album = db.Column(db.String(100))
-    photo_url = db.Column(db.String(100)) #link to album (link)
+    photo_url = db.Column(db.String(1000)) #link to album (link)
     created_time = db.Column(db.DateTime(timezone=False)) #(created_time)
     num_likes = db.Column(db.Integer)
     has_caption = db.Column(db.Integer) #1 for true, 0 for false
