@@ -40,3 +40,4 @@ passlib==1.6.2
 Flask-OAuth==0.12
 Flask-Login==0.2.9
 twilio==3.6.5
+https://github.com/jcgregorio/httplib2.git git + # egg = httplib2
