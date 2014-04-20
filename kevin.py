@@ -1,5 +1,5 @@
 from flask import Flask, redirect, url_for, session, request
-from flask_oauth import OAuth
+from flask_oauthlib.client import OAuth, OAuthException
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 import os
@@ -16,7 +16,7 @@ app.debug = DEBUG
 db = SQLAlchemy(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['KEVIN_DATABASE_URL']
 app.secret_key = SECRET_KEY
-oauth = OAuth()
+oauth = OAuth(app)
 
 class User(db.Model):
     __tablename__ = 'users'
