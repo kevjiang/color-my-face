@@ -177,7 +177,7 @@ def facebook_authorized(resp):
                     if 'total_count' in com.data['summary']:
                         numComments = com.data['summary']['total_count']
 
-                    p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['link'], num_likes=numLikes,\
+                    p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['source'], num_likes=numLikes,\
                             num_comments=numComments, user=u) #change from link to either source or picture later
                     db.session.add(p)
                     i = i+1
