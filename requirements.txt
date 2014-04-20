@@ -13,10 +13,11 @@ newrelic==1.13.1.31
 SQLAlchemy==0.8.0
 Werkzeug==0.8.3
 gunicorn==0.17.2
+lxml==2.3.4 #this?
 node==0.9.11
 odict==1.5.1
 plumber==1.2
-psycopg2==2.5
+psycopg2==2.5 #or this?
 pyScss==1.1.5
 python-dateutil==2.1
 pytz==2013b

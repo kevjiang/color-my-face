@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, session, request
 from flask_oauth import OAuth
-from flask import Flask
+from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 import os
 import pdb
@@ -20,9 +20,9 @@ oauth = OAuth()
 
 class User(db.Model):
     __tablename__ = 'users'
-    # id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     #public information
-    fbid = db.Column(db.String(100), primary_key=True)
+    fbid = db.Column(db.String(100))
     firstname = db.Column(db.String(100))
     lastname = db.Column(db.String(100))
     profile_pic = db.Column(db.String(100))
@@ -63,7 +63,7 @@ class Photo(db.Model):
     #place 
     #prim_color
 
-    fbid = db.Column(db.Integer, db.ForeignKey('users.fbid')) #foreign key to User's id (NOT fbid)
+    fbid = db.Column(db.Integer, db.ForeignKey('users.id')) #foreign key to User's id (NOT fbid)
     user = db.relationship("User", backref=db.backref('photos', order_by=id))
 
     def __repr__(self):
@@ -94,7 +94,8 @@ def index():
     </body>
     </html>
     """
-    # return(render_template('home.html'))
+    # if you want to name your html something different, you should replace example.html
+    # return(render_template('example.html'))
 
 @app.route('/login')
 def login():
@@ -155,6 +156,7 @@ def facebook_authorized(resp):
             if (item['name'] == 'Profile Pictures' and item['type'] == 'profile'):
                 numPhotos = item['count']
 
+                #insert user into database
                 #this is ok because any user has only 1 profile picture album.
                 u = User(firstname=fn, lastname=ln, 
                 fbid=fi, email=em, gender=ge, birthday=bi, political=po,
@@ -180,7 +182,7 @@ def facebook_authorized(resp):
                         numComments = com.data['summary']['total_count']
 
                     p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['link'], num_likes=numLikes,\
-                            num_comments=numComments, fbid=fi) #change from link to either source or picture later
+                            num_comments=numComments) #change from link to either source or picture later
                     db.session.add(p)
                     i = i+1
                 break #we assume that only one Profile Pictures album exists!

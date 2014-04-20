@@ -1,0 +1,56 @@
+> {-# LANGUAGE Arrows #-}
+
+> module HW10 where
+> import Euterpea
+> import Data.Complex
+
+> mel :: Music1
+> mel =
+>    let m = Euterpea.line [na1 (af 4 qn), na1 (c 5 qn), na1 (ef 5 qn), na1 (c 5 qn),
+>               na2 (ef 4 qn), na2 (g 4 qn), na2 (bf 4 qn), na2 (g 4 qn),
+>               na3 (bf 3 qn), na3 (d 4 qn), na3 (f 4 qn), na3 (d 4 qn),
+>               na1 (c 4 qn), na1 (ef 4 qn), na1 (g 4 qn), na1 (ef 4 qn),
+>               na1 (c 4 qn), na1 (ef 4 qn), na1 (g 4 qn), na1 (ef 4 qn)]
+>        na1 (Prim (Note d p)) = Prim (Note d (p,[Params [1.0, 0.05, 0.2, 0.05, 2]]))
+>        na2 (Prim (Note d p)) = Prim (Note d (p,[Params [1.0, 0.05, 0.2, 0.05, 2]]))
+>        na3 (Prim (Note d p)) = Prim (Note d (p,[Params [1.0, 0.05, 0.2, 0.05, 2]]))
+>    in instrument bongoName m
+
+> waveguide :: Double -> Double -> Double -> AudSF (Double, Double) Double
+> waveguide del12 del23 del14 g1 g2 g3 g4 = proc (1in,2in,3in,4in) -> do
+>    rec 2out <- delayLine del12 -< 2in - g1 * 1out - g3 * 3out 
+>        1out <- delayLine del12 -< 1in - g2 * 2out - g3 * 3out - g4 * 4out
+>        3out <- delayLine del12 -< 3in - g1 * 1out - g2 * 2out 
+
+-->        1out <- delayLine del12 -< 1in - g3 * 3out
+-->        3out <- delayLine del23 -< 3in - g2 * 2out
+-->        2out <- delayLine del23 -< 2in - g3 * 3out
+
+>        4out <- delayLine del14 -< 4in - g1 * 1out
+
+-->        1out <- delayLine del14 -< 1in - g4 * 4out
+
+>    outA -< (1out + 2out + 3out + 4out)/2
+
+> bongoName :: InstrumentName
+> bongoName = Custom "Simple Instrument"
+> bongo :: Instr (Mono AudRate) 
+> bongo d ap v [pmod, att, rel, i1, i2] =
+>     let sinesTable = tableSinesN 4096 [1]
+>         f = apToHz ap
+>         vol = fromIntegral v/100
+>         dur = fromRational d
+>     in proc () -> do
+>        initial <- stick 1 -< ()
+>        t12 <- waveguide 1 0.9 0.9 <- (initial, 0)
+>        t13 <- waveguide 1 0.9 0.9 <- (initial, 0)
+>        t23 <- waveguide 2 0.9 0.9 <- (0, 0)
+>        t14 <- waveguide 4 0.9 0.9 <- (initial, 0)
+>        env <- envASR att dur rel -< ()
+>        outA -<  env * vol /2
+
+> myInstrMap :: InstrMap (Mono AudRate)
+> myInstrMap = [(bongoName, bongo)]
+> (y, sf) = renderSF mel myInstrMap 
+> main = outFile "fm2.wav" y sf
+
