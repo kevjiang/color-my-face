@@ -56,9 +56,9 @@ class Photo(db.Model):
     pid = db.Column(db.String(1000))
     # album = db.Column(db.String(100))
     photo_url = db.Column(db.String(1000)) #link to album (link)
-    created_time = db.Column(db.DateTime(timezone=False)) #(created_time)
+    created_time = db.Column(db.String(100)) #(created_time)
     num_likes = db.Column(db.Integer)
-    has_caption = db.Column(db.Integer) #1 for true, 0 for false
+    # has_caption = db.Column(db.Integer) #1 for true, 0 for false
     # num_tags = db.Column(db.Integer) #number of people tagged in photo
     num_comments = db.Column(db.Integer) #number of comments on photo
 
@@ -68,7 +68,7 @@ class Photo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id')) #foreign key to User's id (NOT fbid)
 
     def __repr__(self):
-        return '#%d: Photo ID: %sPhoto URL: %s, Likes: %d, Comments: %d' % (self.id, self.pid, self.photo_url, self.num_likes, self.num_comments)
+        return '#%d: Photo ID: %sPhoto URL: %s, Likes: %d, Comments: %d, Created Time: %s' % (self.id, self.pid, self.photo_url, self.num_likes, self.num_comments, self.created_time)
 
 
 facebook = oauth.remote_app('facebook',
@@ -178,7 +178,7 @@ def facebook_authorized(resp):
                         numComments = com.data['summary']['total_count']
 
                     p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['source'], num_likes=numLikes,\
-                            num_comments=numComments, user=u) #change from link to either source or picture later
+                            num_comments=numComments, created_time=photoArray[i]['created_time'], user=u) 
                     db.session.add(p)
                     i = i+1
                 break #we assume that only one Profile Pictures album exists!
