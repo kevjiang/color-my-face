@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, session, request
 from flask_oauth import OAuth
-from flask import Flask, render_template
+from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 import os
 import pdb
@@ -54,16 +54,16 @@ class Photo(db.Model):
     pid = db.Column(db.String(100), primary_key=True)
     # album = db.Column(db.String(100))
     photo_url = db.Column(db.String(100)) #link to album (link)
-    # created_time = db.Column(db.DateTime(timezone=False)) #(created_time)
+    created_time = db.Column(db.DateTime(timezone=False)) #(created_time)
     num_likes = db.Column(db.Integer)
-    # has_caption = db.Column(db.Integer) #1 for true, 0 for false
+    has_caption = db.Column(db.Integer) #1 for true, 0 for false
     # num_tags = db.Column(db.Integer) #number of people tagged in photo
     num_comments = db.Column(db.Integer) #number of comments on photo
 
     #place 
     #prim_color
 
-    fbid = db.Column(db.Integer, db.ForeignKey('users.id')) #foreign key to User's id (NOT fbid)
+    id = db.Column(db.Integer, db.ForeignKey('users.id')) #foreign key to User's id (NOT fbid)
     user = db.relationship("User", backref=db.backref('photos', order_by=id))
 
     def __repr__(self):
@@ -94,8 +94,7 @@ def index():
     </body>
     </html>
     """
-    # if you want to name your html something different, you should replace example.html
-    # return(render_template('example.html'))
+    # return(render_template('home.html'))
 
 @app.route('/login')
 def login():
@@ -145,8 +144,6 @@ def facebook_authorized(resp):
         if 'religion' in me.data:
             re=me.data['religion']
 
-        #must do similar checks for dictionary 
-
         #we use an FQL query b/c it is the only thing that supports friend_count and thus can count all friends
         numFriends = facebook.get('/fql?q=SELECT%20friend_count%20FROM%20user%20WHERE%20uid%20=%20' + me.data['id']).data['data'][0]['friend_count'] 
         
@@ -156,8 +153,6 @@ def facebook_authorized(resp):
             if (item['name'] == 'Profile Pictures' and item['type'] == 'profile'):
                 numPhotos = item['count']
 
-                #insert user into database
-                #this is ok because any user has only 1 profile picture album.
                 u = User(firstname=fn, lastname=ln, 
                 fbid=fi, email=em, gender=ge, birthday=bi, political=po,
                 rel_status=rs, religion=re,
