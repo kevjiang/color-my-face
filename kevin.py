@@ -178,7 +178,7 @@ def facebook_authorized(resp):
                         numComments = com.data['summary']['total_count']
 
                     p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['link'], num_likes=numLikes,\
-                            num_comments=numComments) #change from link to either source or picture later
+                            num_comments=numComments, user=u) #change from link to either source or picture later
                     db.session.add(p)
                     i = i+1
                 break #we assume that only one Profile Pictures album exists!
