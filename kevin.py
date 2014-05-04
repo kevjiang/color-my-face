@@ -229,6 +229,10 @@ def facebook_authorized(resp):
 
         db.session.commit()
 
+    return redirect(url_for('complete'))
+
+@app.route('/complete')
+def complete():
     return render_template('thankyou.html')
 
 @facebook.tokengetter
