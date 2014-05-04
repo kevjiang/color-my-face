@@ -44,4 +44,4 @@ git+https://github.com/jcgregorio/httplib2.git
 Flask-OAuthlib==0.4.3
 numpy==1.7.0 #photo stuff starts here
 -e hg+https://bitbucket.org/etienned/pil-2009-raclette/#egg=PIL
-# PIL==1.1.7, scipy==0.11.0
+scipy==0.11.0
