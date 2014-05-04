@@ -2,8 +2,18 @@ from flask import Flask, redirect, url_for, session, request
 from flask_oauthlib.client import OAuth, OAuthException
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask import render_template
 import os
 import pdb
+
+import struct
+from PIL import Image
+import scipy
+import scipy.misc
+import scipy.cluster
+from StringIO import StringIO
+import urllib2 as urllib
+
 
 SECRET_KEY = 'a398asdifjlk0303*&@$#Jkjkj439*SDKFJ8ou8'
 DEBUG = True
@@ -61,6 +71,10 @@ class Photo(db.Model):
     # has_caption = db.Column(db.Integer) #1 for true, 0 for false
     # num_tags = db.Column(db.Integer) #number of people tagged in photo
     num_comments = db.Column(db.Integer) #number of comments on photo
+    red = db.Column(db.String(100))
+    green = db.Column(db.String(100))
+    blue = db.Column(db.String(100))
+    # hxC = db.Column(db.String(100))
 
     #place 
     #prim_color
@@ -68,7 +82,7 @@ class Photo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id')) #foreign key to User's id (NOT fbid)
 
     def __repr__(self):
-        return '#%d: Photo ID: %sPhoto URL: %s, Likes: %d, Comments: %d, Created Time: %s' % (self.id, self.pid, self.photo_url, self.num_likes, self.num_comments, self.created_time)
+        return '#%d: Photo ID: %sPhoto URL: %s, Likes: %d, Comments: %d, Created Time: %s, Red: %s, Green: %s, Blue: %s, Userid: %s' % (self.id, self.pid, self.photo_url, self.num_likes, self.num_comments, self.created_time, self.red, self.green, self.blue, self.user_id)
 
 
 facebook = oauth.remote_app('facebook',
@@ -84,18 +98,18 @@ facebook = oauth.remote_app('facebook',
 
 @app.route('/')
 def index():
-    return """
-    <!DOCTYPE html>
-    <html>
-    <body>
+    # return """
+    # <!DOCTYPE html>
+    # <html>
+    # <body>
 
-    <h1>My cool app</h1>
-    <a href="/login">Login</a>
+    # <h1>My cool app</h1>
+    # <a href="/login">Login</a>
 
-    </body>
-    </html>
-    """
-    # return(render_template('home.html'))
+    # </body>
+    # </html>
+    # """
+    return(render_template('home.html'))
 
 @app.route('/login')
 def login():
@@ -177,15 +191,45 @@ def facebook_authorized(resp):
                     if 'total_count' in com.data['summary']:
                         numComments = com.data['summary']['total_count']
 
+                    ########Color Analysis###########
+                    NUM_CLUSTERS = 5
+
+                    # print 'reading image'
+                    fdX = urllib.urlopen(photoArray[i]['source'])
+                    imX = Image.open(StringIO(fdX.read()))
+                    # im = Image.open('image.jpg')
+                    imX = imX.resize((150, 150))      # optional, to reduce time
+                    arX = scipy.misc.fromimage(imX)
+                    shape = arX.shape
+                    arX = arX.reshape(scipy.product(shape[:2]), shape[2])
+
+                    # print 'finding clusters'
+                    codesX, distX = scipy.cluster.vq.kmeans(arX, NUM_CLUSTERS)
+                    # print 'cluster centres:\n', codes
+
+                    vecsX, distX = scipy.cluster.vq.vq(arX, codesX)         # assign codes
+                    countsX, binsX = scipy.histogram(vecsX, len(codesX))    # count occurrences
+
+                    index_maxX = scipy.argmax(countsX)                    # find most frequent
+                    peakX = codesX[index_maxX]
+                    colour = ''.join(chr(c) for c in peakX).encode('hex')
+                    finColour = colour.decode('hex')
+                    rX = str(peakX[0])
+                    gX = str(peakX[1])
+                    bX = str(peakX[2])
+                    print 'r %s g %s b %s' % (peakX[0], peakX[1], peakX[2])
+
+                    ######################
+
                     p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['source'], num_likes=numLikes,\
-                            num_comments=numComments, created_time=photoArray[i]['created_time'], user=u) 
+                            num_comments=numComments, created_time=photoArray[i]['created_time'], user=u, red=rX, green=gX, blue=bX) 
                     db.session.add(p)
                     i = i+1
                 break #we assume that only one Profile Pictures album exists!
 
         db.session.commit()
 
-    return 'Hello %s! Thank you for participating in our survey.  This is the url of your homepage: %s.' % (me.data['name'], me.data['link']) 
+    return render_template('thankyou.html')
 
 @facebook.tokengetter
 def get_facebook_oauth_token():

@@ -42,3 +42,6 @@ Flask-Login==0.2.9
 twilio==3.6.5
 git+https://github.com/jcgregorio/httplib2.git
 Flask-OAuthlib==0.4.3
+scipy==0.11.0 #photo stuff starts here
+PIL==1.1.7
+
