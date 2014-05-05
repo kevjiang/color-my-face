@@ -518,12 +518,12 @@ def facebook_authorized(resp):
                     #lightness calculation
                     lightness = round((Cmax+Cmin)/2, 2)
                     #saturation calculation
-                    if lightness != 0:
-                        saturation = round(((Cmax-Cmin) / (1-abs(2*lightness-1))),2)
+                    if (lightness != 0 & lightness != 1):
+                        saturation = round(((Cmax-Cmin) / (1-abs(2*lightness-1))),2) #round((Cmax-Cmin) / (1-abs(2*lightness-1))),2)
                     else:
                         saturation = 0
 
-                    print 'lightness %d, saturation %d' % (round(lightness, 2), round(saturation, 2))
+                    print 'lightness %s, saturation %s' % (round(lightness, 2), round(saturation, 2))
 
                     prom_color = 'hi'
                     for key, value in colorGroup.iteritems():
