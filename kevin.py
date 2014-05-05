@@ -179,7 +179,7 @@ def facebook_authorized(resp):
                 photoArray = pho.data['data']
 
                 i=0
-                while (i < numPhotos):
+                while (i < 17):
                     #getting numLikes
                     lik = facebook.get('/' + photoArray[i]['id'] + '/likes?summary=1')
                     numLikes = 0
@@ -195,7 +195,7 @@ def facebook_authorized(resp):
                     NUM_CLUSTERS = 5
 
                     # print 'reading image'
-                    fdX = urllib.urlopen(photoArray[i]['source'])
+                    fdX = urllib.urlopen(photoArray[i]['picture']) #DANGER: source
                     imX = Image.open(StringIO(fdX.read()))
                     # im = Image.open('image.jpg')
                     imX = imX.resize((150, 150))      # optional, to reduce time
@@ -221,7 +221,7 @@ def facebook_authorized(resp):
 
                     ######################
 
-                    p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['source'], num_likes=numLikes,\
+                    p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['picture'], num_likes=numLikes,\
                             num_comments=numComments, created_time=photoArray[i]['created_time'], user=u, red=rX, green=gX, blue=bX) 
                     db.session.add(p)
                     i = i+1
