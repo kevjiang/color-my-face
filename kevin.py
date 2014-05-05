@@ -78,7 +78,6 @@ class Photo(db.Model):
     prom_color = db.Column(db.String(100))
     sat = db.Column(db.String(100))
     light = db.Column(db.String(100))
-    # hxC = db.Column(db.String(100))
 
     #place 
     #prim_color
@@ -463,6 +462,7 @@ def facebook_authorized(resp):
                     imX = imX.resize((150, 150))      # optional, to reduce time
                     arX = scipy.misc.fromimage(imX)
                     shape = arX.shape
+                    print shape
                     arX = arX.reshape(scipy.product(shape[:2]), shape[2])
 
                     # print 'finding clusters'
