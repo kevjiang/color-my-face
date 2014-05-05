@@ -74,6 +74,9 @@ class Photo(db.Model):
     red = db.Column(db.String(100))
     green = db.Column(db.String(100))
     blue = db.Column(db.String(100))
+    prom_color = db.Column(db.String(100))
+    sat = db.Column(db.String(100))
+    light = db.Column(db.String(100))
     # hxC = db.Column(db.String(100))
 
     #place 
@@ -82,7 +85,7 @@ class Photo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id')) #foreign key to User's id (NOT fbid)
 
     def __repr__(self):
-        return '#%d: Photo ID: %sPhoto URL: %s, Likes: %d, Comments: %d, Created Time: %s, Red: %s, Green: %s, Blue: %s, Userid: %s' % (self.id, self.pid, self.photo_url, self.num_likes, self.num_comments, self.created_time, self.red, self.green, self.blue, self.user_id)
+        return '#%d: Photo ID: %sPhoto URL: %s, Likes: %d, Comments: %d, Created Time: %s, Red: %s, Green: %s, Blue: %s, Prom_Color: %s, Saturation: %s, Lightness: %s, Userid: %s' % (self.id, self.pid, self.photo_url, self.num_likes, self.num_comments, self.created_time, self.red, self.green, self.blue, self.prom_color, self.sat, self.light, self.user_id)
 
 
 facebook = oauth.remote_app('facebook',
@@ -179,7 +182,261 @@ def facebook_authorized(resp):
                 photoArray = pho.data['data']
 
                 i=0
-                while (i < 17):
+
+                rgbColor = {
+                    #reds
+                    'maroon': [128, 0, 0],
+                    'dark red': [139, 0, 0],
+                    'firebrick': [178, 34, 34],
+                    'crimson': [220, 20, 60],
+                    'red': [255, 0, 0],
+                    'tomato': [255, 99, 71],
+                    'indian red': [205, 92, 92],
+                    'light coral': [240, 128, 128],
+                    #oranges
+                    'coral': [255, 127, 80],
+                    'dark salmon': [233, 150, 122],
+                    'salmon': [250, 128, 114],
+                    'light salmon': [255, 160, 122],
+                    'orange red': [255, 69, 0],
+                    'dark orange': [255, 140, 0],
+                    'orange': [255, 165, 0],
+                    #yellows
+                    'gold': [255, 215, 0],
+                    'golden rod': [218, 165, 32],
+                    'yellow': [255, 255, 0],
+                    'corn silk': [255, 248, 220],
+                    'lemon chiffon': [255, 250, 205],
+                    'light golden rod yellow': [250, 250, 210],
+                    'light yellow': [255, 255, 224],
+                    #browns
+                    'brown': [165, 42, 42],
+                    'dark golden rod': [184, 134, 11],
+                    'pale golden rod': [238, 232, 170],
+                    'dark khaki': [189, 183, 107],
+                    'khaki': [240, 230, 140],
+                    'saddle brown': [139, 69, 19],
+                    'sienna': [160, 82, 45],
+                    'chocolate': [210, 105, 30],
+                    'sandy brown': [244, 164, 96],
+                    'burly wood': [222, 184, 135],
+                    'tan': [210, 180, 140],
+                    'rosy brown': [188, 143, 143],
+                    #greens
+                    'olive': [128, 128, 0],
+                    'yellow green': [154, 205, 50],
+                    'dark olive green': [85, 107, 47],
+                    'olive drab': [107, 142, 35],
+                    'lawn green': [124, 252, 0],
+                    'chart reuse': [127, 255, 0],
+                    'green yellow': [173, 255, 47],
+                    'dark green': [0, 100, 0],
+                    'green': [0, 128, 0],
+                    'forest green': [34, 139, 34],
+                    'lime': [0, 255, 0],
+                    'lime green': [50, 205, 50],
+                    'light green': [144, 238, 144],
+                    'pale green': [152, 251, 152],
+                    'dark sea green': [143, 188, 143],
+                    'medium spring green': [0, 250, 154],
+                    'spring green': [0, 255, 127],
+                    'sea green': [46, 139, 87],
+                    'medium agua marine': [102, 205, 170],
+                    'medium sea green': [60, 179, 113],
+                    #aquas
+                    'light sea green': [32, 178, 170],
+                    'dark slate gray': [47, 79, 79],
+                    'teal': [0, 128, 128],
+                    'dark cyan': [0, 139, 139],
+                    'aqua': [0, 255, 255],
+                    'dark turquoise': [0, 206, 209],
+                    'turquoise': [64, 224, 208],
+                    'medium turquoise': [72, 209, 204],
+                    'pale turquoise': [175, 238, 238],
+                    'aqua marine': [127, 255, 212],
+                    'powder blue': [176, 224, 230],
+                    'cadet blue': [95, 158, 160],
+                    #blues
+                    'steel blue': [70, 130, 180],
+                    'corn flower blue': [100, 149, 237],
+                    'deep sky blue': [0, 191, 255],
+                    'dodger blue': [30, 144, 255],
+                    'light blue': [173, 216, 230],
+                    'sky blue': [135, 206, 235],
+                    'light sky blue': [135, 206, 250],
+                    'midnight blue': [25, 25, 112],
+                    'navy': [0, 0, 128],
+                    'dark blue': [0, 0, 139],
+                    'medium blue': [25, 25, 112],
+                    'blue': [0, 0, 255],
+                    'royal blue': [65, 105, 225],
+                    #purples
+                    'blue violet': [138, 43, 226],
+                    'indigo': [75, 0, 130],
+                    'dark slate blue': [72, 61, 139],
+                    'slate blue': [106, 90, 205],
+                    'medium slate blue': [123, 104, 238],
+                    'medium purple': [147, 112, 219],
+                    'dark magenta': [139, 0, 139],
+                    'dark violet': [148, 0, 211],
+                    'dark orchid': [153, 50, 204],
+                    'medium orchid': [186, 85, 211],
+                    'purple': [128, 0, 128],
+                    'lavendar': [230, 230, 250],
+                    #pinks
+                    'thistle': [216, 191, 216],
+                    'plum': [221, 160, 221],
+                    'violet': [238, 130, 238],
+                    'magenta': [255, 0, 255],
+                    'orchid': [218, 112, 214],
+                    'medium violet red': [199, 21, 133],
+                    'pale violet red': [219, 112, 147],
+                    'deep pink': [255, 20, 147],
+                    'hot pink': [255, 105, 180],
+                    'light pink': [255, 192, 203],
+                    #egg, beige
+                    'antique white': [250, 235, 215],
+                    'beige': [245, 245, 220],
+                    'bisque': [255, 228, 196],
+                    'blanched almond': [255, 235, 205],
+                    'wheat': [245, 222, 179],
+                    'peach': [255, 218, 185],
+                    #gray
+                    'black': [0, 0, 0]
+                    }
+
+                colorGroup = {
+                    #reds
+                    'maroon': 'red',
+                    'dark red': 'red',
+                    'firebrick': 'red',
+                    'crimson': 'red',
+                    'red': 'red',
+                    'tomato': 'red',
+                    'indian red': 'red',
+                    'light coral': 'red',
+                    #oranges
+                    'coral': 'orange',
+                    'dark salmon': 'orange',
+                    'salmon': 'orange',
+                    'light salmon': 'orange',
+                    'orange red': 'orange',
+                    'dark orange': 'orange',
+                    'orange': 'orange',
+                    #yellows
+                    'gold': 'yellow',
+                    'golden rod': 'yellow',
+                    'yellow': 'yellow',
+                    'corn silk': 'yellow',
+                    'lemon chiffon': 'yellow',
+                    'light golden rod yellow': 'yellow',
+                    'light yellow': 'yellow',
+                    #browns
+                    'brown': 'brown',
+                    'dark golden rod': 'brown',
+                    'pale golden rod': 'brown',
+                    'dark khaki': 'brown',
+                    'khaki': 'brown',
+                    'saddle brown': 'brown',
+                    'sienna': 'brown',
+                    'chocolate': 'brown',
+                    'sandy brown': 'brown',
+                    'burly wood': 'brown',
+                    'tan': 'brown',
+                    'rosy brown': 'brown',
+                    #greens
+                    'olive': 'green',
+                    'yellow green': 'green',
+                    'dark olive green': 'green',
+                    'olive drab': 'green',
+                    'lawn green': 'green',
+                    'chart reuse': 'green',
+                    'green yellow': 'green',
+                    'dark green': 'green',
+                    'green': 'green',
+                    'forest green': 'green',
+                    'lime': 'green',
+                    'lime green': 'green',
+                    'light green': 'green',
+                    'pale green': 'green',
+                    'dark sea green': 'green',
+                    'medium spring green': 'green',
+                    'spring green': 'green',
+                    'sea green': 'green',
+                    'medium agua marine': 'green',
+                    'medium sea green': 'green',
+                    #aquas
+                    'light sea green': 'aqua',
+                    'dark slate gray': 'aqua',
+                    'teal': 'aqua',
+                    'dark cyan': 'aqua',
+                    'aqua': 'aqua',
+                    'dark turquoise': 'aqua',
+                    'turquoise': 'aqua',
+                    'medium turquoise': 'aqua',
+                    'pale turquoise': 'aqua',
+                    'aqua marine': 'aqua',
+                    'powder blue': 'aqua',
+                    'cadet blue': 'aqua',
+                    #blues
+                    'steel blue': 'blue',
+                    'corn flower blue': 'blue',
+                    'deep sky blue': 'blue',
+                    'dodger blue': 'blue',
+                    'light blue': 'blue',
+                    'sky blue': 'blue',
+                    'light sky blue': 'blue',
+                    'midnight blue': 'blue',
+                    'navy': 'blue',
+                    'dark blue': 'blue',
+                    'medium blue': 'blue',
+                    'blue': 'blue',
+                    'royal blue': 'blue',
+                    #purples
+                    'blue violet': 'purple',
+                    'indigo': 'purple',
+                    'dark slate blue': 'purple',
+                    'slate blue': 'purple',
+                    'medium slate blue': 'purple',
+                    'medium purple': 'purple',
+                    'dark magenta': 'purple',
+                    'dark violet': 'purple',
+                    'dark orchid': 'purple',
+                    'medium orchid': 'purple',
+                    'purple': 'purple',
+                    'lavendar': 'purple',
+                    #pinks
+                    'thistle': 'pink',
+                    'plum': 'pink',
+                    'violet': 'pink',
+                    'magenta': 'pink',
+                    'orchid': 'pink',
+                    'medium violet red': 'pink',
+                    'pale violet red': 'pink',
+                    'deep pink': 'pink',
+                    'hot pink': 'pink',
+                    'light pink': 'pink',
+                    #egg, beige
+                    'antique white': 'beige',
+                    'beige': 'beige',
+                    'bisque': 'beige',
+                    'blanched almond': 'beige',
+                    'wheat': 'beige',
+                    'peach': 'beige',
+                    #gray
+                    'slate gray': 'gray',
+                    'light slate gray': 'gray',
+                    'light steel blue': 'gray',
+                    'dim gray': 'gray',
+                    'gray': 'gray',
+                    'dark gray': 'gray',
+                    'silver': 'gray',
+                    'light gray': 'gray',
+                    'gainsboro': 'gray',
+                    # 'white': 'white',
+                    'black': 'black'
+                    }
+                while (i < 15):
                     #getting numLikes
                     lik = facebook.get('/' + photoArray[i]['id'] + '/likes?summary=1')
                     numLikes = 0
@@ -195,7 +452,7 @@ def facebook_authorized(resp):
                     NUM_CLUSTERS = 5
 
                     # print 'reading image'
-                    fdX = urllib.urlopen(photoArray[i]['picture']) #DANGER: source
+                    fdX = urllib.urlopen(photoArray[i]['source'])
                     imX = Image.open(StringIO(fdX.read()))
                     # im = Image.open('image.jpg')
                     imX = imX.resize((150, 150))      # optional, to reduce time
@@ -217,12 +474,62 @@ def facebook_authorized(resp):
                     rX = str(peakX[0])
                     gX = str(peakX[1])
                     bX = str(peakX[2])
+
+                    ##### most frequent r, g, b of the photo
                     print 'r %s g %s b %s' % (peakX[0], peakX[1], peakX[2])
+
+
+                    ##### find closest corresponding color, return the color and color range
+
+                    def dist(r, g, b, x, y, z):
+                        return ((r-x)**2 + (g-y)**2 + (b-z)**2)
+                   
+                    mindist = 10000000000
+                    answer = 'answer'
+
+                    if (peakX[0] == peakX[1] & peakX[0] == peakX[2]):
+                        answer = 'gray'
+                    else:
+                        for key, value in rgbColor.iteritems():
+                            x = dist(peakX[0], peakX[1], peakX[2], value[0], value[1], value[2])
+                            if (x < mindist):
+                                mindist = x
+                                answer = key
+                                xred = value [0]
+                                xgreen = value[1]
+                                xblue = value[2]
+
+                    print 'closest color is %s' % (answer)
+
+                    print 'rgb for closest color is %d, %d, %d' % (xred, xgreen, xblue)
+
+                    yred = peakX[0]/255.00
+                    ygreen = peakX[1]/255.00
+                    yblue = peakX[2]/255.00
+
+                    Cmax = max(yred, ygreen, yblue)
+                    Cmin = min(yred, ygreen, yblue)
+
+                    #lightness calculation
+                    lightness = round((Cmax+Cmin)/2, 2)
+                    #saturation calculation
+                    if lightness != 0:
+                        saturation = round((Cmax-Cmin) / (1-abs(2*lightness-1)),2)
+                    else:
+                        saturation = 0
+
+                    print 'lightness %d, saturation %d' % (round(lightness, 2), round(saturation, 2))
+
+
+                    for key, value in colorGroup.iteritems():
+                        if key == answer:
+                            print 'color group %s' % (value)
 
                     ######################
 
-                    p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['picture'], num_likes=numLikes,\
-                            num_comments=numComments, created_time=photoArray[i]['created_time'], user=u, red=rX, green=gX, blue=bX) 
+                    p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['source'], num_likes=numLikes,\
+                            num_comments=numComments, created_time=photoArray[i]['created_time'], user=u, red=rX, green=gX, blue=bX,
+                            prom_color=answer, sat=saturation, light=lightness) 
                     db.session.add(p)
                     i = i+1
                 break #we assume that only one Profile Pictures album exists!
