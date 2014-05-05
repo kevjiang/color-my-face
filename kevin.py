@@ -434,6 +434,7 @@ def facebook_authorized(resp):
                     'silver': 'gray',
                     'light gray': 'gray',
                     'gainsboro': 'gray',
+                    'gray': 'gray',
                     # 'white': 'white',
                     'black': 'black'
                     }
