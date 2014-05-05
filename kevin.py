@@ -488,7 +488,7 @@ def facebook_authorized(resp):
                     mindist = 10000000000
                     answer = 'answer'
 
-                    if (peakX[0] == peakX[1] & peakX[0] == peakX[2]):
+                    if (abs(peakX[0] - peakX[1]) < 15 & abs(peakX[0] - peakX[2]) < 15 & abs(peakX[1] - peakX[2]) < 15):
                         answer = 'gray'
                     else:
                         for key, value in rgbColor.iteritems():
