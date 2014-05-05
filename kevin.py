@@ -437,7 +437,10 @@ def facebook_authorized(resp):
                     # 'white': 'white',
                     'black': 'black'
                     }
-                while (i < 15):
+                photoCap = 15
+                if (numPhotos <= 15):
+                    photoCap = numPhotos
+                while (i < photoCap):
                     #getting numLikes
                     lik = facebook.get('/' + photoArray[i]['id'] + '/likes?summary=1')
                     numLikes = 0
