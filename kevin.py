@@ -506,7 +506,7 @@ def facebook_authorized(resp):
 
                     print 'closest color is %s' % (answer)
 
-                    print 'rgb for closest color is %d, %d, %d' % (xred, xgreen, xblue)
+                    # print 'rgb for closest color is %d, %d, %d' % (xred, xgreen, xblue)
 
                     yred = peakX[0]/255.00
                     ygreen = peakX[1]/255.00
