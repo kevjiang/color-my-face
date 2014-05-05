@@ -74,6 +74,7 @@ class Photo(db.Model):
     red = db.Column(db.String(100))
     green = db.Column(db.String(100))
     blue = db.Column(db.String(100))
+    true_color = db.Column(db.String(100))
     prom_color = db.Column(db.String(100))
     sat = db.Column(db.String(100))
     light = db.Column(db.String(100))
@@ -85,7 +86,7 @@ class Photo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id')) #foreign key to User's id (NOT fbid)
 
     def __repr__(self):
-        return '#%d: Photo ID: %sPhoto URL: %s, Likes: %d, Comments: %d, Created Time: %s, Red: %s, Green: %s, Blue: %s, Prom_Color: %s, Saturation: %s, Lightness: %s, Userid: %s' % (self.id, self.pid, self.photo_url, self.num_likes, self.num_comments, self.created_time, self.red, self.green, self.blue, self.prom_color, self.sat, self.light, self.user_id)
+        return '#%d: Photo ID: %sPhoto URL: %s, Likes: %d, Comments: %d, Created Time: %s, Red: %s, Green: %s, Blue: %s, True_Color: %s, Prom_Color: %s, Saturation: %s, Lightness: %s, Userid: %s' % (self.id, self.pid, self.photo_url, self.num_likes, self.num_comments, self.created_time, self.red, self.green, self.blue, self.true_color, self.prom_color, self.sat, self.light, self.user_id)
 
 
 facebook = oauth.remote_app('facebook',
@@ -529,7 +530,7 @@ def facebook_authorized(resp):
 
                     p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['source'], num_likes=numLikes,\
                             num_comments=numComments, created_time=photoArray[i]['created_time'], user=u, red=rX, green=gX, blue=bX,
-                            prom_color=answer, sat=saturation, light=lightness) 
+                            true_color=answer, prom_color=value, sat=saturation, light=lightness) 
                     db.session.add(p)
                     i = i+1
                 break #we assume that only one Profile Pictures album exists!
