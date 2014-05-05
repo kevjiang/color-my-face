@@ -519,7 +519,7 @@ def facebook_authorized(resp):
                     lightness = round((Cmax+Cmin)/2, 2)
                     #saturation calculation
                     if lightness != 0:
-                        saturation = round((Cmax-Cmin) / (1-abs(2*lightness-1)),2)
+                        saturation = round(((Cmax-Cmin) / (1-abs(2*lightness-1))),2)
                     else:
                         saturation = 0
 
