@@ -492,7 +492,7 @@ def facebook_authorized(resp):
                     mindist = 10000000000
                     answer = 'answer'
 
-                    if (abs(peakX[0] - peakX[1]) < 15 & abs(peakX[0] - peakX[2]) < 15 & abs(peakX[1] - peakX[2]) < 15):
+                    if (abs(peakX[0] - peakX[1]) < 15 and abs(peakX[0] - peakX[2]) < 15 and abs(peakX[1] - peakX[2]) < 15):
                         answer = 'gray'
                     else:
                         for key, value in rgbColor.iteritems():
@@ -518,7 +518,7 @@ def facebook_authorized(resp):
                     #lightness calculation
                     lightness = round((Cmax+Cmin)/2, 2)
                     #saturation calculation
-                    if (lightness != 0 & lightness != 1):
+                    if (lightness != 0 and lightness < 1.0):
                         saturation = round(((Cmax-Cmin) / (1-abs(2*lightness-1))),2) #round((Cmax-Cmin) / (1-abs(2*lightness-1))),2)
                     else:
                         saturation = 0
