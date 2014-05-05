@@ -521,16 +521,17 @@ def facebook_authorized(resp):
 
                     print 'lightness %d, saturation %d' % (round(lightness, 2), round(saturation, 2))
 
-
+                    prom_color = 'hi'
                     for key, value in colorGroup.iteritems():
                         if key == answer:
+                            prom_color = value
                             print 'color group %s' % (value)
 
                     ######################
 
                     p = Photo(pid=photoArray[i]['id'], photo_url=photoArray[i]['source'], num_likes=numLikes,\
                             num_comments=numComments, created_time=photoArray[i]['created_time'], user=u, red=rX, green=gX, blue=bX,
-                            true_color=answer, prom_color=value, sat=saturation, light=lightness) 
+                            true_color=answer, prom_color=prom_color, sat=saturation, light=lightness) 
                     db.session.add(p)
                     i = i+1
                 break #we assume that only one Profile Pictures album exists!
