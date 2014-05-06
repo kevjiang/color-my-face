@@ -139,7 +139,7 @@ def facebook_authorized(resp):
     # frnds = facebook.get('/me/friends?limit=5000')
     # print albumArray
 
-    if (0) : #User.query.filter(User.fbid == me.data['id']).first() is None:
+    if User.query.filter(User.fbid == me.data['id']).first() is None: #User.query.filter(User.fbid == me.data['id']).first() is None:
         #checks to see that all keys exist in dictionary me.data
         #if key doesn't exist, sets field in User row to 'N/A'
         fn=ln=fi=em=ge=bi=po=rs=re='N/A'
